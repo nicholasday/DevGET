@@ -28,7 +28,7 @@ let getPrizes = function(divs) {
         }
     }
 
-    return undefined;
+    return null;
 }
 
 let getPrizeList = function(text) {
@@ -43,24 +43,27 @@ let getSubmissionInfoOfPage = function(page) {
 
     let submissions = [];
 
-    for (var i = 1, row ; row = table.rows[i] ; i++) { 
+    for (let i = 1, row ; row = table.rows[i] ; i++) { 
         let submission = row.cells[2].getElementsByTagName("div")[0]; 
         let title = submission.getElementsByTagName("p")[0].innerText;
-        let projectLink = submission.getElementsByTagName("p")[0].getElementsByTagName("a")[0].href;
+        let projectLink =
+            submission
+            .getElementsByTagName("p")[0]
+            .getElementsByTagName("a")[0].href;
 
-        var request = new XMLHttpRequest();
-        // we set async to false, just because performance isn't of much importance
-        // here...
+        let request = new XMLHttpRequest();
+        // we set async to false, just because performance isn't of much
+        // importance here...
         request.open("GET", projectLink, false);
         request.send(null);
 
-        var projectPage = document.createElement("html");
+        let projectPage = document.createElement("html");
         projectPage.innerHTML = request.responseText;
-        // this is annoying... turns out you cannot do '.getElementById' on DOM elts
-        var prizesText = getEltById(projectPage, 'opt_in_prizes').innerText;
-        //var prizesText = getPrizes(projectPage.getElementsByTagName("div")).getElementsByTagName("p")[0].innerText;
+        // this is annoying... turns out you cannot do '.getElementById' on DOM
+        // elts
+        let prizesText = getEltById(projectPage, 'opt_in_prizes').innerText;
 
-        var prizes = getPrizeList(prizesText);
+        let prizes = getPrizeList(prizesText);
 
         console.log({"title": title, "prizes": prizes});
         submissions.push({"title": title, "prizes": prizes});
