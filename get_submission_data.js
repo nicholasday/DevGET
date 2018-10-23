@@ -35,6 +35,20 @@ let getPrizeList = function(text) {
     return text.split(":")[1].trim().split(",");
 }
 
+let getProjectLink = (link) => fetch(link).then(data => {
+    let projectPage = document.createElement("html");
+    projectPage.innerHTML = data.text()
+    // this is annoying... turns out you cannot do '.getElementById' on DOM
+    // elts
+    let prizesText = getEltById(projectPage, 'opt_in_prizes').innerText;
+    let prizes = getPrizeList(prizesText);
+
+    let item = {"title": title, "prizes": prizes};
+
+    console.log(item);
+    return item;
+})
+
 // dev post is ultimately paginated... so we have to scrap page by page
 let getSubmissionInfoOfPage = function(page) {
     let table = 
@@ -51,23 +65,10 @@ let getSubmissionInfoOfPage = function(page) {
             .getElementsByTagName("p")[0]
             .getElementsByTagName("a")[0].href;
 
-        let request = new XMLHttpRequest();
-        // we set async to false, just because performance isn't of much
-        // importance here...
-        request.open("GET", projectLink, false);
-        request.send(null);
-
-        let projectPage = document.createElement("html");
-        projectPage.innerHTML = request.responseText;
-        // this is annoying... turns out you cannot do '.getElementById' on DOM
-        // elts
-        let prizesText = getEltById(projectPage, 'opt_in_prizes').innerText;
-
-        let prizes = getPrizeList(prizesText);
-
-        console.log({"title": title, "prizes": prizes});
-        submissions.push({"title": title, "prizes": prizes});
+        submissions.push(getProjectLink(projectLink));
     }
+
+    Promise.all(submissions).then(console.log);
 
     return submissions;
 }
